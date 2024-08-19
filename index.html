@@ -21,13 +21,13 @@
             border-radius: 25px;
             padding: 10px 20px;
             width: 25vw;
-            background-color: rgb(30, 30, 30);
+            background-color: rgba(255, 255, 255, 0.07);
             color: rgb(255, 255, 255);
             font-size: 1em;
             margin-right: 10px;
         }
         .get {
-            background-color: rgb(50, 50, 50);
+            background-color: rgba(255, 255, 255, 0.175);
             border: none;
             border-radius: 15px;
             color: rgb(255, 255, 255);
@@ -38,16 +38,37 @@
             transition: all ease 0.3s;
         }
         .get:hover {
-            background-color: rgb(40, 40, 40);
+            background-color: rgba(255, 255, 255, 0.125);
         }
         .output {
             border-radius: 10px;
-            background-color: rgb(30, 30, 30);
+            background-color: rgba(255, 255, 255, 0.07);
             padding: 20px;
             width: 50vw;
             text-align: left;
             overflow-x: auto;
-            scrollbar-width: none;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.175) rgba(15, 15, 15);
+        }
+        
+        .answer {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .success {
+            background-color: rgba(144, 253, 189, 0.1);
+        }
+
+        .disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .answer:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
