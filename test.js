@@ -31,7 +31,12 @@ document.querySelector('.get').addEventListener('click', async () => {
     let curr = 0;
     
     if (url.includes("/dashboard/assignments")) {
-        getInfos = await getIDs(url)
+        try {
+            getInfos = await getIDs(url)
+        } catch (error) {  
+            document.querySelector('.output').textContent = 'Error: ' + "This feature is only available when you login to your account and access the assignment page first.";
+            return;
+        }
         names = getInfos.map(e => e.attributes.title);
         ids = getInfos.map(e => e.id);
         if (ids.length > 0) {
@@ -48,14 +53,12 @@ document.querySelector('.get').addEventListener('click', async () => {
     async function getIDs(url) {
         const aiD = url.substringAfter("/assignments/").substringBefore("/").trim()
 
-        const cock = "48a901c2bbbe595ffa83eacd58865a28"
         let response = await fetch(`https://learn.eltngl.com/api/v2/assignments/${aiD}?include=contents&id=${aiD}`, 
             {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
-                    'set-cookie': "_unity_session=" + cock
                 }
             }
         );
