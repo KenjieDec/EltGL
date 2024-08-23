@@ -31,13 +31,8 @@ document.querySelector('.get').addEventListener('click', async () => {
     let curr = 0;
     
     if (url.includes("/dashboard/assignments")) {
-        try {
-            getInfos = await getIDs(url)
-        } catch (error) {  
-            document.querySelector('.output').textContent = 'Error: ' + "This feature is only available when you login to your account and access the assignment page first.";
-            return;
-        }
-        names = getInfos.map(e => e.attributes.title);
+        getInfos = await getIDs(url)
+        names = getInfos.map(e => e.title);
         ids = getInfos.map(e => e.id);
         if (ids.length > 0) {
             id = ids[curr];
@@ -53,17 +48,9 @@ document.querySelector('.get').addEventListener('click', async () => {
     async function getIDs(url) {
         const aiD = url.substringAfter("/assignments/").substringBefore("/").trim()
 
-        let response = await fetch(`https://learn.eltngl.com/api/v2/assignments/${aiD}?include=contents&id=${aiD}`, 
-            {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            }
-        );
+        let response = await fetch(`https://eltngl-ass.vercel.app/?id=${aiD}`);
         let text = await response.json();
-        return text.included;
+        return text;
     }
 
 
