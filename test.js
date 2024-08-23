@@ -22,13 +22,79 @@ String.prototype.removeSuffix = function (suffix) {
 };
 
 document.querySelector('.get').addEventListener('click', async () => {
+    
     let url = document.querySelector('.input').value.trim();
     let id = "e";
+    let ids = [];
+    let names = [];
+    let getInfos;
+    let curr = 0;
     
-    if (url) {
+    if (url.includes("/dashboard/assignments")) {
+        getInfos = await getIDs(url)
+        names = getInfos.map(e => e.attributes.title);
+        ids = getInfos.map(e => e.id);
+        if (ids.length > 0) {
+            id = ids[curr];
+
+            document.querySelector('.ass').textContent = names[curr];
+            document.querySelector('.prev').disabled = curr === 0;
+            document.querySelector('.next').disabled = curr === ids.length - 1;
+        }
+    } else if (url) {
         id = url.substringAfter("/cdn_proxy/").substringAfter("api/interactives/").substringBefore("?").substringBefore("/");
     }
 
+    async function getIDs(url) {
+        const aiD = url.substringAfter("/assignments/").substringBefore("/").trim()
+
+        const cock = "48a901c2bbbe595ffa83eacd58865a28"
+        let response = await fetch(`https://learn.eltngl.com/api/v2/assignments/${aiD}?include=contents&id=${aiD}`, 
+            {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'set-cookie': "_unity_session=" + cock
+                }
+            }
+        );
+        let text = await response.json();
+        return text.included;
+    }
+
+
+    document.querySelector('.prev').addEventListener('click', async () => {
+        if (curr > 0) {
+            curr--;
+            id = ids[curr]
+            await fullChange(id);
+
+            document.querySelector('.ass').textContent = names[curr];
+            document.querySelector('.prev').disabled = curr === 0;
+            document.querySelector('.next').disabled = curr === ids.length - 1;
+        }
+    });
+
+    document.querySelector('.next').addEventListener('click', async () => {
+        if (curr < ids.length - 1) {
+            curr++;
+            id = ids[curr]
+            await fullChange(id);
+            
+            document.querySelector('.ass').textContent = names[curr];
+            document.querySelector('.prev').disabled = curr === 0;
+            document.querySelector('.next').disabled = curr === ids.length - 1;
+        }
+    });
+
+    await fullChange(id)
+});
+
+
+
+
+async function fullChange(id) {
     try {
         if(id == "e") throw new Error("Invalid URL");
         let response = await fetch(`https://learn.eltngl.com/cdn_proxy/${id.trim()}/data.js`);
@@ -37,35 +103,58 @@ document.querySelector('.get').addEventListener('click', async () => {
         let get = text.substringAfter("ajaxData = ").removeSuffix(";");
         let json = JSON.parse(get);
 
-        // console.log(json["cat2588317.xml"])
+        // console.log(json["cat2586626.xml"])
         function getAnswers(document) {
             let infos = {};
             const reDec = document.querySelectorAll('[id="contentblock"]')
             const reDec2 = document.querySelectorAll('[identifier="Input:Creative:Free writing"]')
             var howMany = 0;
             var ret = 0;
-            
+            var plus = 0;
             if(reDec2[0]) {
                 var idd = document.querySelectorAll('option[id="319"] p');
                 idd.forEach((el, i) => {
-                    const index = i + 1
-                    infos[index] = infos[index] || [];
-                    infos[index].push(el ? el.innerHTML.replace(/<br\s*\/?>/gi, '\n').trim() : '');
+                    let index = i + 1
+                    if(el.querySelector("u strong")) {
+                        plus += 1 
+                        el = el.querySelector("u strong")
+                        infos["Q" + plus] = infos["Q" + plus] || [];
+                        infos["Q" + plus].push("\n" + (el ? el.textContent + ": \n" : ''));
+                    } else {
+                        index = (plus != 0) ? plus : i + 1
+                        infos["Q" + index] = infos["Q" + index] || [];
+                        infos["Q" + index].push(el ? el.innerHTML.replace(/<br\s*\/?>/gi, '\n').replace(/<em\s*\/?>/gi, '').trim() : '');
+                        //console.log(infos)
+                    }
+                    //console.log(el, plus)
                 })
+                return infos
             }
 
             reDec.forEach((el, i) => {
                 var val = el.querySelectorAll(`[identifier]`);
                 if(val.length == 0) val = el.querySelectorAll(`[responseidentifier]`);
+                if(ret == 1) return
                 val.forEach((el2, i2) => {
-                    if(ret == 1) return
                     const attr = el2.getAttribute("responseidentifier");
                     var text = el2.textContent; // n
                     
                     if(text.length == 0){
-                        text = document.querySelector(`[identifier="${attr}"]`).textContent
+                        text = document.querySelector(`[identifier="${attr}"]`)
+                        if(text) text = text.textContent
+                        else {
+                            ret = 1
+                            document.querySelectorAll("responsedeclaration").forEach((el5, i4) => {
+                                el5.querySelectorAll("value").forEach(el6 => {
+                                    var text2 = el6.textContent; 
+                                    var number = i4 + 1
+                                    infos["Q" + number] = text2;
+                                });
+                            });
+                        }
                     }
-                    console.log(text)
+                    if(ret == 1) return
+                    // console.log(text)
                     if(text.startsWith("GT")) return;
                     var el3 = document.querySelector(`[identifier="${el2.getAttribute("responseidentifier")}"]`);
                     var number
@@ -82,7 +171,7 @@ document.querySelector('.get').addEventListener('click', async () => {
                     if(!el3){
                         el3 = document.querySelector(`[responseidentifier]`).getAttribute("responseidentifier");
                         el3 = document.querySelector(`[identifier="${el3}"]`);
-                       
+                    
                         const baseType = el3.getAttribute("basetype")
                         console.log(baseType)
                         
@@ -158,8 +247,10 @@ document.querySelector('.get').addEventListener('click', async () => {
         }
 
         function checker2(obj) {
+            console.log(obj)
             const otput = document.querySelector('.output');
             otput.innerHTML = '';
+            // console.log(obj)
             
             for (const q in obj) {
                 var quest = obj[q];
@@ -191,7 +282,7 @@ document.querySelector('.get').addEventListener('click', async () => {
                             })
                         });
                         otput.appendChild(spant);
-                        if(i < quest.length - 1) otput.appendChild(spont);
+                        if(i < quest.length - 1 && !t.includes(": \n")) otput.appendChild(spont);
                     })
                 } else {
                     const spant = document.createElement('span');
@@ -217,10 +308,18 @@ document.querySelector('.get').addEventListener('click', async () => {
                 }
             }
         }
-
-        if (answers.length > 1) {
+        if(answers.length == 2){
+            var o = true
+            for (var i = 1; i <= answers[0].length; ++i) {
+                if (answers[0]["Q" + i] !== answers[1]["Q" + i]) {
+                    o = false
+                    console.log(i)
+                    break;
+                };
+            }
+            if(i == true) answers = answers[0]
+        } else if (answers.length > 1) {
             let temp = {};
-            console.log(answers)
             answers.forEach((obj, i) => {
                 const value = Object.values(obj);
                 
@@ -237,4 +336,4 @@ document.querySelector('.get').addEventListener('click', async () => {
         if(error.message.includes("Unexpected token")) error.message = "Invalid URL";
         document.querySelector('.output').textContent = 'Error: ' + error.message;
     }
-});
+} 
