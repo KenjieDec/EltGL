@@ -125,107 +125,109 @@ async function fullChange(id) {
             reDec.forEach((el, i) => {
                 var val = el.querySelectorAll(`[identifier]`);
 
-                var el100 = document.querySelector(`[responseidentifier]`).getAttribute("responseidentifier");
-                el100 = document.querySelector(`[identifier="${el100}"]`);
-                
-                if(el.querySelectorAll(`tr [identifier]`) && el100.getAttribute("basetype") == "directedPair") {
-                    var val2 = el.querySelectorAll(`tr`);
-                    var val2L = val2[0].childElementCount
-                    trUse = true
-
-                    if(val.length == 0) val = el.querySelectorAll(`[responseidentifier]`);
-                    if(ret == 1) return
-                    var ignoreNumber = []
-                    val2.forEach((el5, i5) => {
-                        val = el5.querySelectorAll(`[identifier]`);
-                        val.forEach((el2, i2) => {
-                            const attr = el2.getAttribute("responseidentifier");
-                            var text = el2.textContent; // n
-                            
-                            if(text.length == 0){
-                                text = document.querySelector(`[identifier="${attr}"]`)
-                                if(text) text = text.textContent
-                            }
-                            if(ret == 1) return
-                            // console.log(text)
-                            var el3 = document.querySelector(`[identifier="${el2.getAttribute("responseidentifier")}"]`);
-                            var number
-                            try {
-                                var responseIdentifier = el2.getAttribute("responseidentifier");
-                                if (responseIdentifier) {
-                                    number = parseInt(responseIdentifier.replace("RESPONSE", "")) + 1 - howMany || i2 + 1 - howMany;
-                                } else {
-                                    throw new Error('Attribute "responseidentifier" is missing or empty');
-                                }
-                            } catch (error) {
-                                number = i2 + 1 - howMany;
-                            }
-                        
-                            if(!el3){
-                                el3 = document.querySelector(`[responseidentifier]`).getAttribute("responseidentifier");
-                                el3 = document.querySelector(`[identifier="${el3}"]`);
-                            
-                                const baseType = el3.getAttribute("basetype")
-                                
-                                const cardinality = el3.getAttribute("cardinality")
-                                if (baseType == "pair"){
-                                    var identifier = el2.getAttribute("identifier")
-                                    number = identifier.replace("A", "").replace("B", "")
+                var el100 = document.querySelector(`[responseidentifier]`)
+                if(el100) el100 = el100.getAttribute("responseidentifier");
+                if(el100) el100 = document.querySelector(`[identifier="${el100}"]`);
+                if(el100) {
+                    if(el.querySelectorAll(`tr [identifier]`).length > 0 && el100.getAttribute("basetype") == "directedPair") {
+                        var val2 = el.querySelectorAll(`tr`);
+                        var val2L = val2[0].childElementCount
+                        trUse = true
     
-                                    infos["Q" + number] = infos["Q" + number] || [];
-                                    console.log(identifier)
-                                    if(identifier.startsWith("A")) infos["Q" + number][0] = el2 ? el2.textContent : '';
-                                    if(identifier.startsWith("B")) infos["Q" + number][1] = el2 ? el2.textContent : '';
-                                } else if (baseType == "directedPair"){
-                                    el3 = document.querySelector(`[id="${el2.getAttribute("id")}"]`);
+                        if(val.length == 0) val = el.querySelectorAll(`[responseidentifier]`);
+                        if(ret == 1) return
+                        var ignoreNumber = []
+                        val2.forEach((el5, i5) => {
+                            val = el5.querySelectorAll(`[identifier]`);
+                            val.forEach((el2, i2) => {
+                                const attr = el2.getAttribute("responseidentifier");
+                                var text = el2.textContent; // n
+                                
+                                if(text.length == 0){
+                                    text = document.querySelector(`[identifier="${attr}"]`)
+                                    if(text) text = text.textContent
+                                }
+                                if(ret == 1) return
+                                // console.log(text)
+                                var el3 = document.querySelector(`[identifier="${el2.getAttribute("responseidentifier")}"]`);
+                                var number
+                                try {
+                                    var responseIdentifier = el2.getAttribute("responseidentifier");
+                                    if (responseIdentifier) {
+                                        number = parseInt(responseIdentifier.replace("RESPONSE", "")) + 1 - howMany || i2 + 1 - howMany;
+                                    } else {
+                                        throw new Error('Attribute "responseidentifier" is missing or empty');
+                                    }
+                                } catch (error) {
+                                    number = i2 + 1 - howMany;
+                                }
+                            
+                                if(!el3){
+                                    el3 = document.querySelector(`[responseidentifier]`).getAttribute("responseidentifier");
+                                    el3 = document.querySelector(`[identifier="${el3}"]`);
+                                
+                                    const baseType = el3.getAttribute("basetype")
                                     
-                                    number = i2 + 1
-                                    if(ignoreNumber.includes(number)) {
-                                        ignoreNumber.forEach((item) => {
-                                            //console.log(item)
-                                            if(item == number && number < val2L) {
-                                                var changed = 0
-                                                for(var i = 0; i < ignoreNumber.length; i++) {
-                                                    if(ignoreNumber.includes(number - changed + i)){
-                                                        number++
-                                                        changed++
+                                    const cardinality = el3.getAttribute("cardinality")
+                                    if (baseType == "pair"){
+                                        var identifier = el2.getAttribute("identifier")
+                                        number = identifier.replace("A", "").replace("B", "")
+        
+                                        infos["Q" + number] = infos["Q" + number] || [];
+                                        console.log(identifier)
+                                        if(identifier.startsWith("A")) infos["Q" + number][0] = el2 ? el2.textContent : '';
+                                        if(identifier.startsWith("B")) infos["Q" + number][1] = el2 ? el2.textContent : '';
+                                    } else if (baseType == "directedPair"){
+                                        el3 = document.querySelector(`[id="${el2.getAttribute("id")}"]`);
+                                        
+                                        number = i2 + 1
+                                        if(ignoreNumber.includes(number)) {
+                                            ignoreNumber.forEach((item) => {
+                                                //console.log(item)
+                                                if(item == number && number < val2L) {
+                                                    var changed = 0
+                                                    for(var i = 0; i < ignoreNumber.length; i++) {
+                                                        if(ignoreNumber.includes(number - changed + i)){
+                                                            number++
+                                                            changed++
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        })
+                                            })
+                                        }
+                                        if(el2.parentElement.getAttribute("colspan")) {
+                                            ignoreNumber.push(number)
+                                        }
+                                        infos["Q" + number] = infos["Q" + number] || [];
+                
+                                        infos["Q" + number].push(el3 ? el3.textContent : '');
+                                    } else if (cardinality == "single" || cardinality == "multiple"){
+                                        ret = 1
+                                        document.querySelectorAll("responsedeclaration").forEach((el5, i4) => {
+                                            el5.querySelectorAll("value").forEach(el6 => {
+                                                const text2 = el6.textContent; // n
+                                                const el4 = document.querySelector(`[responseidentifier="${el5.getAttribute("identifier")}"] [identifier="${text2}"]`);
+                                                var number2 = i4 + 1
+                                                infos["Q" + number2] = infos["Q" + number2] || [];
+                                                infos["Q" + number2].push(el4 ? el4.textContent : '');
+                                            });
+                                        });
+                                    } else if (baseType == "identifier") {
                                     }
-                                    if(el2.parentElement.getAttribute("colspan")) {
-                                        ignoreNumber.push(number)
+                                } else {
+                                    if(el2.parentElement.hasAttribute("responseidentifier")) {
+                                        number = number -  1
+                                        howMany++
                                     }
                                     infos["Q" + number] = infos["Q" + number] || [];
-            
+        
                                     infos["Q" + number].push(el3 ? el3.textContent : '');
-                                } else if (cardinality == "single" || cardinality == "multiple"){
-                                    ret = 1
-                                    document.querySelectorAll("responsedeclaration").forEach((el5, i4) => {
-                                        el5.querySelectorAll("value").forEach(el6 => {
-                                            const text2 = el6.textContent; // n
-                                            const el4 = document.querySelector(`[responseidentifier="${el5.getAttribute("identifier")}"] [identifier="${text2}"]`);
-                                            var number2 = i4 + 1
-                                            infos["Q" + number2] = infos["Q" + number2] || [];
-                                            infos["Q" + number2].push(el4 ? el4.textContent : '');
-                                        });
-                                    });
-                                } else if (baseType == "identifier") {
                                 }
-                            } else {
-                                if(el2.parentElement.hasAttribute("responseidentifier")) {
-                                    number = number -  1
-                                    howMany++
-                                }
-                                infos["Q" + number] = infos["Q" + number] || [];
+                            });
+                        })
     
-                                infos["Q" + number].push(el3 ? el3.textContent : '');
-                            }
-                        });
-                    })
-
-                    return infos
+                        return infos
+                    }
                 }
                 
                 if(val.length == 0) val = el.querySelectorAll(`[responseidentifier]`);
