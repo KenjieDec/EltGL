@@ -259,7 +259,7 @@ async function fullChange(id) {
                                 });
                             } else {
                                 const checkExist2 = tElement.textContent.split("|").filter(str => /\w+/.test(str))
-                                if(checkExist2.length >= 1) {
+                                if(checkExist2.length > 1) {
                                     infos["Q" + number].push(tElement ? checkExist2[0] : '');
                                 } else {
                                     infos["Q" + number].push(tElement ? tElement.textContent : '');
@@ -283,7 +283,6 @@ async function fullChange(id) {
             return sorted.map(key => obj[key]); // j
         }
 
-        console.log(id)
         let answers = getValuesWithPrefix(json, "cat").map(e => getAnswers(new DOMParser().parseFromString(e, 'text/html'))); // i
         
         function checker(value) {
