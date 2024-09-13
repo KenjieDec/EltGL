@@ -160,6 +160,7 @@ async function fullChange(id) {
             }
 
             reDec.forEach((el, i) => {
+                if(ret == 1) return
                 var val = el.querySelectorAll(`[identifier]`);
 
                 // for directedPair like Pronunciation Extra
@@ -172,10 +173,10 @@ async function fullChange(id) {
                     }
                 
                 if(val.length == 0) val = el.querySelectorAll(`[responseidentifier]`);
-                if(ret == 1) return
 
                 
                 val.forEach((vElement, i2) => {
+                    if(ret == 1) return
                     let text = vElement.textContent || document.querySelector(`[identifier="${vElement.getAttribute("responseidentifier")}"]`)?.textContent || '';
                     
                     if (text.length === 0) {
@@ -187,7 +188,6 @@ async function fullChange(id) {
                         });
                         return infos;
                     }
-                    if(ret == 1) return
                     // console.log(text)
                     var number
                     var tElement = document.querySelector(`[identifier="${vElement.getAttribute("responseidentifier")}"]`);
@@ -232,6 +232,17 @@ async function fullChange(id) {
                                     infos["Q" + number2].push(el4 ? el4.textContent : '');
                                 });
                             });
+                        } else if(cardinality == "ordered"){
+                            ret = 1
+                            document.querySelectorAll('[id="contentblock"]').forEach((kont, kontil) => {
+                                kont = kont.cloneNode(true);
+                                kont.querySelectorAll('[id="contentblock"]').forEach(e=>e.remove())
+                                const gaps = kont.querySelectorAll("gap")
+                                infos["Q" + (kontil + 1)] = infos["Q" + (kontil+1)] || [];
+                                gaps.forEach((gap, gin) => {
+                                    infos["Q" + (kontil + 1)].push(gap.getAttribute("label"));
+                                })
+                            })
                         } else if (baseType == "identifier") {
                         }
                     } else {
@@ -243,15 +254,13 @@ async function fullChange(id) {
                         if(tElement.textContent){
                             const checkExist = tElement.textContent.split(" | ").filter(str => /\w+/.test(str))
                             if(checkExist.length > 1) {
-                                checkExist.forEach((tElement2) => {
+                                checkExist.forEach((tElement2) => { 
                                     infos["Q" + number].push(tElement2);
                                 });
                             } else {
                                 const checkExist2 = tElement.textContent.split("|").filter(str => /\w+/.test(str))
-                                if(checkExist2.length > 1) {
-                                    checkExist2.forEach((tElement2) => {
-                                        infos["Q" + number].push(tElement2);
-                                    });
+                                if(checkExist2.length >= 1) {
+                                    infos["Q" + number].push(tElement ? checkExist2[0] : '');
                                 } else {
                                     infos["Q" + number].push(tElement ? tElement.textContent : '');
                                 }
@@ -274,6 +283,7 @@ async function fullChange(id) {
             return sorted.map(key => obj[key]); // j
         }
 
+        console.log(id)
         let answers = getValuesWithPrefix(json, "cat").map(e => getAnswers(new DOMParser().parseFromString(e, 'text/html'))); // i
         
         function checker(value) {
