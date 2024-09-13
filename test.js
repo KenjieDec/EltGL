@@ -241,13 +241,20 @@ async function fullChange(id) {
                         }
                         infos["Q" + number] = infos["Q" + number] || [];
                         if(tElement.textContent){
-                            const checkExist = tElement.textContent.split(" | ")
+                            const checkExist = tElement.textContent.split(" | ").filter(str => /\w+/.test(str))
                             if(checkExist.length > 1) {
                                 checkExist.forEach((tElement2) => {
                                     infos["Q" + number].push(tElement2);
                                 });
                             } else {
-                                infos["Q" + number].push(tElement ? tElement.textContent : '');
+                                const checkExist2 = tElement.textContent.split("|").filter(str => /\w+/.test(str))
+                                if(checkExist2.length > 1) {
+                                    checkExist2.forEach((tElement2) => {
+                                        infos["Q" + number].push(tElement2);
+                                    });
+                                } else {
+                                    infos["Q" + number].push(tElement ? tElement.textContent : '');
+                                }
                             }
                         }
                         
