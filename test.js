@@ -319,6 +319,7 @@ async function fullChange(id) {
                 if(Array.isArray(quest)){
                     otput.appendChild(spank);
                     quest.forEach((t, i) => {
+                        if(!(typeof t === 'string' || t instanceof String)) t = "" 
                         const spant = document.createElement('span');
                         spant.className = 'answer';
                         spant.textContent = `${t.replaceAll("&quot;", "\"")}`;
